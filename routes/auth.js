@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const path = require('path');
@@ -12,8 +13,8 @@ router.get('/login', (req, res) => {
 router.post('/login', (req, res) => {
     const { username, password } = req.body;
     const params = {
-        AuthFlow: 'USER_PASSWORD_AUTH',
-        ClientId: 'YOUR_COGNITO_APP_CLIENT_ID',
+        AuthFlow: process.env.USER_PASSWORD_AUTH,
+        ClientId: process.env.COGNITO_APP_CLIENT_ID,
         AuthParameters: {
             USERNAME: username,
             PASSWORD: password

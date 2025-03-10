@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -10,9 +12,9 @@ const PORT = 3000;
 
 // AWS SDK Configuration
 AWS.config.update({
-    region: 'us-west-2', // change to your region
-    accessKeyId: 'AKIAT7JJUZHBXOLMFAED',
-    secretAccessKey: '/LVy6wQJ563ATUCU3q7SLp4YQVHju1e2uVnlNNeK'
+    region: process.env.AWS_REGION, 
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 });
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
 
