@@ -3,19 +3,45 @@
 
 <head>
     <title>Register</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script>
+        function validateForm() {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const error = document.getElementById("error-message");
+
+            if (password.length < 6) {
+                error.textContent = "Password must be at least 6 characters long.";
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                error.textContent = "Passwords do not match.";
+                return false;
+            }
+
+            error.textContent = "";
+            return true;
+        }
+    </script>
 </head>
 
 <body>
     <h1>Register</h1>
-    <form method="POST" action="/auth/register">
+    <form method="POST" action="/auth/register" onsubmit="return validateForm()">
         <label for="username">Username:</label>
         <input type="text" name="username" id="username" required><br>
 
         <label for="password">Password:</label>
         <input type="password" name="password" id="password" required><br>
 
+        <label for="confirmPassword">Confirm Password:</label>
+        <input type="password" id="confirmPassword" required><br>
+
         <label for="email">Email:</label>
         <input type="email" name="email" id="email" required><br>
+
+        <p id="error-message" style="color:red;"></p>
 
         <button type="submit">Register</button>
     </form>
