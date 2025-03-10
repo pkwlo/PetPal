@@ -4,10 +4,55 @@
 <head>
     <title>Pet Care App - Home</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script>
+        // Check if the user is logged in
+        function checkLoginStatus() {
+            fetch('/check-auth')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isAuthenticated) {
+                        // User is logged in
+                        document.getElementById('login-button').style.display = 'none';
+                        document.getElementById('nav-bar').style.display = 'block';
+                    } else {
+                        // User is not logged in
+                        document.getElementById('login-button').style.display = 'block';
+                        document.getElementById('nav-bar').style.display = 'none';
+                    }
+                });
+        }
+
+        // Run the check when the page loads
+        window.onload = checkLoginStatus;
+    </script>
 </head>
 
 <body>
+    <h1>Welcome to PetPal!</h1>
 
+    <!-- About Us Section -->
+    <section>
+        <h2>About Us</h2>
+        <p>Are you dying to show off your pet to the world?</p>
+        <p>Are you dying to see cute pictures of other people’s animals?</p>
+        <p>You can do this on PetPal! An inclusive platform for all walks of pet, where anyone can share pictures of
+            their animal!</p>
+    </section>
+
+    <!-- Login Button (shown if not logged in) -->
+    <div id="login-button">
+        <a href="/login">Login</a>
+    </div>
+
+    <!-- Navigation Bar (shown if logged in) -->
+    <div id="nav-bar" style="display: none;">
+        <nav>
+            <a href="/profile">Profile</a>
+            <a href="/community">Community</a>
+            <a href="/reminders">Reminders</a>
+            <a href="/logout">Logout</a>
+        </nav>
+    </div>
 </body>
 
 </html>

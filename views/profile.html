@@ -4,10 +4,42 @@
 <head>
     <title>Pet Profile</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script>
+        // Fetch user info and populate the page
+        function fetchUserInfo() {
+            fetch('/profile/user-info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        window.location.href = '/login';
+                    } else {
+                        // Populate user info
+                        document.getElementById('email').innerText = data.email;
+                        document.getElementById('gender').innerText = data.gender;
+                        document.getElementById('name').innerText = data.name;
+                        document.getElementById('picture').src = data.picture;
+                    }
+                });
+        }
+
+        // Run the fetch when the page loads
+        window.onload = fetchUserInfo;
+    </script>
 </head>
 
 <body>
     <h1>Pet Profile</h1>
+
+    <!-- Display user info -->
+    <div>
+        <p>Email: <span id="email"></span></p>
+        <p>Gender: <span id="gender"></span></p>
+        <p>Name: <span id="name"></span></p>
+        <img id="picture" src="" alt="Profile Picture" style="width: 100px; height: 100px;">
+    </div>
+
+    <!-- Pet profile form -->
     <form method="POST" action="/profile/submit">
         Name: <input name="name"><br>
         Breed: <input name="breed"><br>

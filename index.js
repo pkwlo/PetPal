@@ -4,67 +4,102 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const AWS = require('aws-sdk');
-const { v4: uuidv4 } = require('uuid');
+const { Issuer, generators } = require('openid-client'); // For OIDC
 
 const app = express();
-const PORT = 3000;
-
-// AWS SDK Configuration
-AWS.config.update({
-    region: process.env.AWS_REGION, 
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-});
-const dynamoClient = new AWS.DynamoDB.DocumentClient();
+const PORT = 8080;
 
 // Middleware
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(session({ secret: 'your-secret-key', resave: false, saveUninitialized: true }));
+app.use(session({
+    secret: 'your-secret-key', // Change this to a secure random string
+    resave: false,
+    saveUninitialized: true
+}));
 
-// Middleware for session-protected routes
-function isAuthenticated(req, res, next) {
-    if (req.session.user) {
-        return next();
-    }
-    res.redirect('/auth/login');
+// Initialize OpenID Client
+let client;
+async function initializeClient() {
+    const issuer = await Issuer.discover('https://cognito-idp.us-west-2.amazonaws.com/us-west-2_eLNBcBQN3');
+    client = new issuer.Client({
+        client_id: process.env.COGNITO_APP_CLIENT_ID,
+        client_secret: process.env.COGNITO_APP_CLIENT_SECRET,
+        redirect_uris: ['http://localhost:8080/authorize'], // Callback URL
+        response_types: ['code']
+    });
 }
+initializeClient().catch(console.error);
 
-// Routes
-const profileRoute = require('./routes/profile');
-const trackingRoute = require('./routes/tracking');
-const communityRoute = require('./routes/community');
-const remindersRoute = require('./routes/reminders');
-const authRoute = require('./routes/auth');
+// Login route
+app.get('/login', (req, res) => {
+    const nonce = generators.nonce();
+    const state = generators.state();
 
-app.use('/profile', isAuthenticated, profileRoute);
-app.use('/tracking', isAuthenticated, trackingRoute);
-app.use('/community', isAuthenticated, communityRoute);
-app.use('/reminders', isAuthenticated, remindersRoute);
-app.use('/auth', authRoute);
+    req.session.nonce = nonce;
+    req.session.state = state;
 
-app.get('/', (req, res) => {
-    let html = '<!DOCTYPE html><html><head><title>Pet Care App - Home</title></head><body>';
-    html += '<h1>Welcome to the Pet Care App</h1>';
-    if (req.session.user) {
-        html += `<p>Hello, ${req.session.user}!</p>`;
-    }
-    html += '<ul>';
-    html += '<li><a href="/auth/login">Login</a></li>';
-    html += '<li><a href="/auth/register">Register</a></li>';
-    html += '<li><a href="/auth/logout">Logout</a></li>';
-    html += '<li><a href="/profile">Pet Profile</a></li>';
-    html += '<li><a href="/tracking">Health Tracking</a></li>';
-    html += '<li><a href="/community">Community</a></li>';
-    html += '<li><a href="/reminders">Reminders</a></li>';
-    html += '</ul></body></html>';
-    res.send(html);
+    const authUrl = client.authorizationUrl({
+        scope: 'email openid profile',
+        state: state,
+        nonce: nonce,
+    });
+
+    res.redirect(authUrl);
 });
 
+// Callback route to handle Cognito response
+app.get('/authorize', async (req, res) => {
+    try {
+        const params = client.callbackParams(req);
+        const tokenSet = await client.callback(
+            'http://localhost:8080/authorize',
+            params,
+            {
+                nonce: req.session.nonce,
+                state: req.session.state,
+            }
+        );
+
+        const userInfo = await client.userinfo(tokenSet.access_token);
+        req.session.userInfo = userInfo;
+
+        res.redirect('/profile'); // Redirect to profile page after login
+    } catch (err) {
+        console.error('Callback error:', err);
+        res.redirect('/'); // Redirect to home if there's an error
+    }
+});
+
+// Route to check if the user is authenticated
+app.get('/check-auth', (req, res) => {
+    res.json({ isAuthenticated: !!req.session.userInfo });
+});
+
+// Home route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views/index.html'));
+});
+
+// Logout route
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error during session destruction", err);
+            return res.redirect('/'); // In case of an error, redirect to home
+        }
+
+        // Clear the session cookie
+        res.clearCookie('connect.sid');
+        res.redirect('/');
+    });
+});
+
+const profileRoute = require('./routes/profile');
+app.use('/profile', profileRoute);
+
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
-
-module.exports.dynamoClient = dynamoClient;

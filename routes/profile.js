@@ -1,25 +1,28 @@
 const express = require('express');
 const router = express.Router();
-const { dynamoClient } = require('../index');
-const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
 router.get('/', (req, res) => {
+    if (!req.session.userInfo) {
+        return res.redirect('/login'); // Redirect to login if not authenticated
+    }
+
+    // Render profile.html with user info
     res.sendFile(path.join(__dirname, '../views/profile.html'));
 });
 
-router.post('/submit', (req, res) => {
-    const { name, breed, age } = req.body;
-    const petId = uuidv4();
+// Route to fetch user info
+router.get('/user-info', (req, res) => {
+    if (!req.session.userInfo) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
 
-    const params = {
-        TableName: 'PetProfiles',
-        Item: { petId, name, breed, age }
-    };
-
-    dynamoClient.put(params, (err) => {
-        if (err) return res.status(500).send('Error saving profile');
-        res.send('Profile saved successfully!');
+    // Return user info from the session
+    res.json({
+        email: req.session.userInfo.email,
+        gender: req.session.userInfo.gender,
+        name: req.session.userInfo.name,
+        picture: req.session.userInfo.picture
     });
 });
 
