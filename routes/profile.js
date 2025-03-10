@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 
+// Serve the profile page
 router.get('/', (req, res) => {
     if (!req.session.userInfo) {
         return res.redirect('/login'); // Redirect to login if not authenticated
     }
 
-    // Render profile.html with user info
+    // Render profile.html
     res.sendFile(path.join(__dirname, '../views/profile.html'));
 });
 
@@ -22,6 +23,7 @@ router.get('/user-info', (req, res) => {
         email: req.session.userInfo.email,
         gender: req.session.userInfo.gender,
         name: req.session.userInfo.name,
+        birthdate: req.session.userInfo.birthdate, // Add birthdate
         picture: req.session.userInfo.picture
     });
 });

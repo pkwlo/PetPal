@@ -18,6 +18,7 @@
                         document.getElementById('email').innerText = data.email;
                         document.getElementById('gender').innerText = data.gender;
                         document.getElementById('name').innerText = data.name;
+                        document.getElementById('birthdate').innerText = data.birthdate;
                         document.getElementById('picture').src = data.picture;
                     }
                 });
@@ -29,23 +30,26 @@
 </head>
 
 <body>
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="/profile">Profile</a>
+        <a href="/community">Community</a>
+        <a href="/reminders">Reminders</a>
+        <a href="/logout">Logout</a>
+    </nav>
+
     <h1>Pet Profile</h1>
 
     <!-- Display user info -->
-    <div>
-        <p>Email: <span id="email"></span></p>
-        <p>Gender: <span id="gender"></span></p>
-        <p>Name: <span id="name"></span></p>
-        <img id="picture" src="" alt="Profile Picture" style="width: 100px; height: 100px;">
+    <div class="profile-container">
+        <img id="picture" src="" alt="Profile Picture" class="profile-pic">
+        <div class="profile-info">
+            <p><strong>Name:</strong> <span id="name"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <p><strong>Gender:</strong> <span id="gender"></span></p>
+            <p><strong>Birthdate:</strong> <span id="birthdate"></span></p>
+        </div>
     </div>
-
-    <!-- Pet profile form -->
-    <form method="POST" action="/profile/submit">
-        Name: <input name="name"><br>
-        Breed: <input name="breed"><br>
-        Age: <input name="age" type="number"><br>
-        <button type="submit">Save</button>
-    </form>
 </body>
 
 </html>
