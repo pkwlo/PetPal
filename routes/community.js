@@ -14,7 +14,7 @@ router.post('/submit', (req, res) => {
 
     const params = {
         TableName: 'CommunityPosts',
-        Item: { postId, username, photoUrl, comment }
+        Item: { imageId, username, photoUrl, comment }
     };
 
     dynamoClient.put(params, (err) => {

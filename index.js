@@ -11,8 +11,8 @@ const PORT = 3000;
 // AWS SDK Configuration
 AWS.config.update({
     region: 'us-west-2', // change to your region
-    accessKeyId: 'YOUR_ACCESS_KEY_ID',
-    secretAccessKey: 'YOUR_SECRET_ACCESS_KEY'
+    accessKeyId: 'AKIAT7JJUZHBXOLMFAED',
+    secretAccessKey: '/LVy6wQJ563ATUCU3q7SLp4YQVHju1e2uVnlNNeK'
 });
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
 
