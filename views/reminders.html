@@ -16,37 +16,62 @@
                     } else {
                         // Populate user info
                         document.getElementById('name').innerText = data.name;
-                        document.getElementById('userId').value = data.sub;
-                        console.log(data.name)
-                        console.log(data.sub)
+                        document.getElementById('userId').value = data.userId;
                     }
                 });
         }
         
         // Fetch upcoming events and populate the page
         function fetchUpcomingEvents() {
-            fetch('/reminders/upcoming')
-                .then(response => response.json())
-                .then(data => {
-                    const eventsContainer = document.querySelector('.events');
-                    eventsContainer.innerHTML = '';
-                    data.forEach(event => {
-                        const eventElement = document.createElement('div');
-                        eventElement.classList.add('event');
-                        eventElement.innerHTML = `
-                            <h2>${event.reminderType}</h2>
-                            <p><strong>Date:</strong> ${event.reminderDate}</p>
-                            <p><strong>Time:</strong> ${event.reminderTime}</p>
+    fetch('/reminders/upcoming')
+        .then(response => response.json())
+        .then(data => {
+            data.sort((a, b) => new Date(a.reminderDate) - new Date(b.reminderDate));
+
+            const eventsContainer = document.querySelector('.events');
+            eventsContainer.innerHTML = '';
+
+            data.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.classList.add('event');
+
+                // Build inner HTML dynamically
+                let html = `
+                    <div class="event-title">
+                        <h2>${event.reminderType?.toUpperCase() || ''}</h2>
+                    </div>
+                    <div class="event-info">
+                        <p><strong>Date:</strong> ${event.reminderDate || ''}</p>
+                `;
+
+                // Only show time if it exists
+                if (event.reminderTime) {
+                    html += `<p><strong>Time:</strong> ${event.reminderTime}</p>`;
+                }
+
+                html += `</div>`; // Close event-info div
+
+                // Only show description if it exists
+                if (event.reminderDescription) {
+                    html += `
+                        <div class="event-description">
                             <p><strong>Description:</strong> ${event.reminderDescription}</p>
-                        `;
-                        eventsContainer.appendChild(eventElement);
-                    });
-                });
-        }
+                        </div>
+                    `;
+                }
+
+                eventElement.innerHTML = html;
+                eventsContainer.appendChild(eventElement);
+            });
+        });
+}
+
 
         // Run the fetch when the page loads
-        window.onload = fetchUserInfo;
-        window.onload = fetchUpcomingEvents;
+        window.onload = function () {
+            fetchUserInfo();
+            fetchUpcomingEvents();
+        };
     </script>
 </head>
 
@@ -58,15 +83,30 @@
         <a href="/reminders">Reminders</a>
         <a href="/logout">Logout</a>
     </nav>
-    <h1>Set a Reminder for <span id="userId"></span></h1>
-    <form method="POST" action="/reminders/submit">
-        <p>Reminder Type: <input name="reminderType"></p>
-        <p>Reminder Date: <input type="date" name="reminderDate"></p>
-        <p>Reminder Time: <input type="time" name="reminderTime"></p>
-        <p>Reminder Description: <input name="reminderDescription"></p>
-        <input type="hidden" name="userId" id="userId">
-        <button type="submit">Set Reminder</button>
-    </form>
+    <h1>Set a Reminder for <span id="name"></span></h1>
+    <div class="reminder-form-container">
+        <form method="POST" action="/reminders/submit" class="reminder-form">
+            <div class="form-row">
+                <label for="reminderType">Reminder Type:</label>
+                <input name="reminderType" id="reminderType" required>
+            </div>
+            <div class="form-row">
+                <label for="reminderDate">Reminder Date:</label>
+                <input type="date" name="reminderDate" id="reminderDate" required>
+            </div>
+            <div class="form-row">
+                <label for="reminderTime">Reminder Time:</label>
+                <input type="time" name="reminderTime" id="reminderTime">
+            </div>
+            <div class="form-row">
+                <label for="reminderDescription">Reminder Description:</label>
+                <input name="reminderDescription" id="reminderDescription">
+            </div>
+            <input type="hidden" name="userId" id="userId">
+            <button type="submit">Set Reminder</button>
+        </form>
+    </div>
+    
     <h1>Upcoming Events</h1>
     <div class="events">
         <!-- events loading here -->

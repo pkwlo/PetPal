@@ -110,14 +110,42 @@ nav a:hover {
 }
 
 /* R#EMINDERS PAGE */
-form {
-    margin: 20px;
-    text-align: center;
+/* form */
+.reminder-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
 }
 
-form p {
-    margin: 10px 0;
+.reminder-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 500px;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-row label {
+    width: 40%;
     font-weight: bold;
+}
+
+.form-row input {
+    width: 58%; /* leaves some gap */
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.reminder-form button {
+    display: block;
+    margin: 0 auto;
 }
 
 button {
@@ -128,4 +156,63 @@ button {
     border-radius: 5px;
     font-weight: bold;
     cursor: pointer;
+    width: 200px;
 }
+
+/* upcoming events */
+
+.events {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.event {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    padding: 10px 50px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* .event-title h2{
+    color: #ff4a3d;
+}
+
+.event-info {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+} */
+
+.event-title h2 {
+    color: #ff4a3d;
+    margin: 6px 0 6px 0; /* reduce space below heading */
+    font-size: 1.2rem;
+}
+
+.event-info {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 6px; /* reduce space after date/time block */
+}
+
+.event-info p,
+.event-description p {
+    margin: 0; /* remove extra vertical spacing */
+    line-height: 1.4; /* tighter but readable text */
+}
+
+.event-description {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+

@@ -12,4 +12,4 @@ const client = new DynamoDBClient({
 
 const dynamoClient = DynamoDBDocumentClient.from(client);
 
-module.exports = dynamoClient;
+module.exports = { dynamoClient }; 
