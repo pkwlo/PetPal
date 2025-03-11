@@ -111,7 +111,7 @@ nav a:hover {
 
 /* R#EMINDERS PAGE */
 /* form */
-.reminder-form-container {
+.reminder-form-container, .post-form-container {
     display: flex;
     justify-content: center;
     align-items: center;

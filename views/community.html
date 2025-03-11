@@ -4,6 +4,25 @@
 <head>
     <title>Community</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script>
+        function fetchPosts() {
+            fetch('/community/posts')
+                .then(response => response.json())
+                .then(data => {
+                    const postsContainer = document.querySelector('.posts');
+                    postsContainer.innerHTML = '';
+
+                    data.forEach(post => {
+                        const postElement = document.createElement('div');
+                        postElement.classList.add('post');
+
+                        // Build inner HTML dynamically
+                        let html = `
+                            <div class="post-image">
+                                <img src="${post.photo}" alt="Community Post">
+                            </div>
+                        `;
+    </script>
 </head>
 
 <body>
@@ -14,13 +33,24 @@
         <a href="/reminders">Reminders</a>
         <a href="/logout">Logout</a>
     </nav>
-    <h1>Community Page</h1>
-    <form method="POST" action="/community/submit">
-        Username: <input name="username"><br>
-        Photo URL: <input name="photoUrl"><br>
-        Comment: <input name="comment"><br>
-        <button type="submit">Post</button>
-    </form>
+    <h1>Upload a Photo</h1>
+    <div class="post-form-container">
+        <form method="POST" action="/community/submit" enctype="multipart/form-data" class="reminder-form">    
+            <div class="form-row">
+                <label for="photo">Photo Upload:</label>
+                <input type="file" name="photo" id="photo" accept="image/*" required>
+            </div>
+            <div class="form-row">
+                <label for="comment">Comment:</label>
+                <input type="text" name="comment" id="comment">
+            </div>
+            <button type="submit">Post to Community</button>
+        </form>
+    </div>
+    <h1>Recent Community Posts</h1>
+    <div class="posts">
+        <!-- posts loading here -->
+    </div>    
 </body>
 
 </html>
