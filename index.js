@@ -99,6 +99,12 @@ app.get('/logout', (req, res) => {
 const profileRoute = require('./routes/profile');
 app.use('/profile', profileRoute);
 
+const remindersRoute = require('./routes/reminders');
+app.use('/reminders', remindersRoute);
+
+const communityRoute = require('./routes/community');
+app.use('/community', communityRoute);
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);

@@ -23,8 +23,9 @@ router.get('/user-info', (req, res) => {
         email: req.session.userInfo.email,
         gender: req.session.userInfo.gender,
         name: req.session.userInfo.name,
-        birthdate: req.session.userInfo.birthdate, // Add birthdate
-        picture: req.session.userInfo.picture
+        birthdate: req.session.userInfo.birthdate,
+        picture: req.session.userInfo.picture,
+        userId: req.session.userInfo.sub,
     });
 });
 
