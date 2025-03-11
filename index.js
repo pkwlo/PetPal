@@ -87,14 +87,18 @@ app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error("Error during session destruction", err);
-            return res.redirect('/'); // In case of an error, redirect to home
+            return res.redirect('/');
         }
 
-        // Clear the session cookie
         res.clearCookie('connect.sid');
-        res.redirect('/');
+
+        // Correct logout URL for Cognito
+        const logoutUrl = `https://us-west-2elnbcbqn3.auth.us-west-2.amazoncognito.com/logout?client_id=${process.env.COGNITO_APP_CLIENT_ID}&logout_uri=${encodeURIComponent('http://localhost:8080')}`;
+
+        res.redirect(logoutUrl);
     });
 });
+
 
 const profileRoute = require('./routes/profile');
 app.use('/profile', profileRoute);
