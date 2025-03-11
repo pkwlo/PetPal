@@ -22,6 +22,15 @@
                                 <img src="${post.photo}" alt="Community Post">
                             </div>
                         `;
+                        if (post.comment) {
+                            html += `<div class="post-comment">${post.comment}</div>`;
+                        }
+                        postElement.innerHTML = html;
+
+                        postsContainer.appendChild(postElement);
+                    });
+                });
+        }
     </script>
 </head>
 
