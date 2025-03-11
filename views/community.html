@@ -4,34 +4,38 @@
 <head>
     <title>Community</title>
     <link rel="stylesheet" href="/css/style.css">
-    <script>
-        function fetchPosts() {
-            fetch('/community/posts')
-                .then(response => response.json())
-                .then(data => {
-                    const postsContainer = document.querySelector('.posts');
-                    postsContainer.innerHTML = '';
+<script>
+    function fetchPosts() {
+        fetch('/community/posts')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched posts:', data); // <--- add this line
+                const postsContainer = document.querySelector('.posts');
+                postsContainer.innerHTML = '';
 
-                    data.forEach(post => {
-                        const postElement = document.createElement('div');
-                        postElement.classList.add('post');
+                data.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.classList.add('post');
 
-                        // Build inner HTML dynamically
-                        let html = `
-                            <div class="post-image">
-                                <img src="${post.photo}" alt="Community Post">
-                            </div>
-                        `;
-                        if (post.comment) {
-                            html += `<div class="post-comment">${post.comment}</div>`;
-                        }
-                        postElement.innerHTML = html;
-
-                        postsContainer.appendChild(postElement);
-                    });
+                    let html = `
+                        <div class="post-image">
+                            <img src="${post.imageId}" alt="Community Post">
+                        </div>
+                    `;
+                    if (post.comment) {
+                        html += `<div class="post-comment">${post.comment}</div>`;
+                    }
+                    postElement.innerHTML = html;
+                    postsContainer.appendChild(postElement);
                 });
-        }
-    </script>
+            })
+            .catch(err => console.error('Error fetching posts:', err)); // <-- also important
+    }
+
+    // Call this when page loads
+    window.onload = fetchPosts;
+</script>
+
 </head>
 
 <body>

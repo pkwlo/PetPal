@@ -109,9 +109,10 @@ nav a:hover {
     height: auto;
 }
 
-/* R#EMINDERS PAGE */
-/* form */
-.reminder-form-container, .post-form-container {
+/* REMINDERS/COMMUNITY PAGE */
+/* forms */
+.reminder-form-container,
+.post-form-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -137,7 +138,8 @@ nav a:hover {
 }
 
 .form-row input {
-    width: 58%; /* leaves some gap */
+    width: 58%;
+    /* leaves some gap */
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -161,14 +163,16 @@ button {
 
 /* upcoming events */
 
-.events {
+.events,
+.posts {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.event {
+.event,
+.post {
     display: flex;
     flex-direction: column;
     margin: 10px;
@@ -183,7 +187,7 @@ button {
 
 .event-title h2 {
     color: #ff4a3d;
-    margin: 6px 0 6px 0; 
+    margin: 6px 0 6px 0;
     font-size: 1.2rem;
 }
 
@@ -196,8 +200,8 @@ button {
 
 .event-info p,
 .event-description p {
-    margin: 0; 
-    line-height: 1.4; 
+    margin: 0;
+    line-height: 1.4;
 }
 
 .event-description {
@@ -205,4 +209,8 @@ button {
     margin-bottom: 4px;
 }
 
-
+img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}

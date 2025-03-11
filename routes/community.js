@@ -1,10 +1,13 @@
 const express = require('express');
 const multer = require('multer');
+const dotenv = require('dotenv');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { v4: uuidv4 } = require('uuid');
 const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 const router = express.Router();
 const path = require('path');
+const { ScanCommand } = require('@aws-sdk/lib-dynamodb');
+
 
 // AWS setup
 const s3 = new S3Client({ region: process.env.AWS_REGION });
@@ -52,7 +55,7 @@ router.post('/submit', upload.single('photo'), async (req, res) => {
 
         await ddb.send(new PutCommand(dbParams));
 
-        res.send('Post uploaded successfully!');
+        res.redirect('/community');
     } catch (err) {
         console.error('Upload error:', err);
         res.status(500).send('Error uploading post');
@@ -66,9 +69,7 @@ router.get('/posts', async (req, res) => {
             Limit: 10,
             ScanIndexForward: false
         };
-
         const data = await ddb.send(new ScanCommand(dbParams));
-
         res.json(data.Items);
     } catch (err) {
         console.error('Error getting posts:', err);
