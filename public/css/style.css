@@ -181,19 +181,9 @@ button {
     text-align: center;
 }
 
-/* .event-title h2{
-    color: #ff4a3d;
-}
-
-.event-info {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-} */
-
 .event-title h2 {
     color: #ff4a3d;
-    margin: 6px 0 6px 0; /* reduce space below heading */
+    margin: 6px 0 6px 0; 
     font-size: 1.2rem;
 }
 
@@ -201,13 +191,13 @@ button {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 6px; /* reduce space after date/time block */
+    margin-bottom: 6px;
 }
 
 .event-info p,
 .event-description p {
-    margin: 0; /* remove extra vertical spacing */
-    line-height: 1.4; /* tighter but readable text */
+    margin: 0; 
+    line-height: 1.4; 
 }
 
 .event-description {
