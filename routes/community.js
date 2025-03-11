@@ -59,4 +59,21 @@ router.post('/submit', upload.single('photo'), async (req, res) => {
     }
 });
 
+router.get('/posts', async (req, res) => {
+    try {
+        const dbParams = {
+            TableName: 'CommunityPosts',
+            Limit: 10,
+            ScanIndexForward: false
+        };
+
+        const data = await ddb.send(new ScanCommand(dbParams));
+
+        res.json(data.Items);
+    } catch (err) {
+        console.error('Error getting posts:', err);
+        res.status(500).send('Error getting posts');
+    }
+});
+
 module.exports = router;
