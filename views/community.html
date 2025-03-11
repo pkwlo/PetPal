@@ -5,6 +5,19 @@
     <title>Community</title>
     <link rel="stylesheet" href="/css/style.css">
 <script>
+    function fetchUserInfo() {
+            fetch('/profile/user-info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        window.location.href = '/login';
+                    } else {
+                        document.getElementById('name').value = data.name;
+                    }
+                });
+        }
+
     function fetchPosts() {
         fetch('/community/posts')
             .then(response => response.json())
@@ -19,7 +32,8 @@
 
                     let html = `
                         <div class="post-image">
-                            <img src="${post.imageId}" alt="Community Post">
+                            <img src="${post.imageUrl}">
+                            posted by ${post.name}
                         </div>
                     `;
                     if (post.comment) {
@@ -33,7 +47,10 @@
     }
 
     // Call this when page loads
-    window.onload = fetchPosts;
+    window.onload = function () {
+            fetchUserInfo();
+            fetchPosts();
+        };
 </script>
 
 </head>
@@ -57,6 +74,7 @@
                 <label for="comment">Comment:</label>
                 <input type="text" name="comment" id="comment">
             </div>
+            <input type="hidden" name="name" id="name">
             <button type="submit">Post to Community</button>
         </form>
     </div>
