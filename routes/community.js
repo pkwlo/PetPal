@@ -36,6 +36,7 @@ router.post('/submit', upload.single('photo'), async (req, res) => {
         const key = `community/${imageId}-${file.originalname}`;
         console.log('Generated S3 key:', key);
         const name = req.session.userInfo.name;
+        const displayPicture = req.session.userInfo.picture;
 
         const s3Params = {
             Bucket: process.env.AWS_S3_BUCKET,
@@ -57,6 +58,7 @@ router.post('/submit', upload.single('photo'), async (req, res) => {
                 imageId,
                 imageUrl,
                 name,
+                displayPicture,
                 comment,
                 timestamp: new Date().toISOString()
             }

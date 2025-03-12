@@ -5,53 +5,41 @@
     <title>Community</title>
     <link rel="stylesheet" href="/css/style.css">
 <script>
-    function fetchUserInfo() {
-            fetch('/profile/user-info')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                        window.location.href = '/login';
-                    } else {
-                        document.getElementById('name').value = data.name;
+    function fetchPosts() {
+        fetch('/community/posts')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched posts:', data);
+                const postsContainer = document.querySelector('.posts');
+                postsContainer.innerHTML = '';
+
+                data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                data.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.classList.add('post');
+                    let html = `
+                        <div class="post-image">
+                            <div class="post-user">
+                                <img id="display-picture" class="display-picture" src=${post.displayPicture}>
+                                ${post.name}
+                            </div>
+                            <img src="${post.imageUrl}">
+                            <div class="post-timestamp">
+                                ${new Date(post.timestamp).toLocaleString()}
+                            </div>
+                        </div>
+                    `;
+                    if (post.comment) {
+                        html += `<div class="post-comment">${post.comment}</div>`;
                     }
+                    postElement.innerHTML = html;
+                    postsContainer.appendChild(postElement);
                 });
-        }
+            })
+            .catch(err => console.error('Error fetching posts:', err));
+    }
 
-        function fetchPosts() {
-    fetch('/community/posts')
-        .then(response => response.json())
-        .then(data => {
-            console.log('Fetched posts:', data);
-            const postsContainer = document.querySelector('.posts');
-            postsContainer.innerHTML = '';
-
-            // 🔥 Sort by timestamp (descending: most recent first)
-            data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            data.forEach(post => {
-                const postElement = document.createElement('div');
-                postElement.classList.add('post');
-
-                let html = `
-                    <div class="post-image">
-                        <img src="${post.imageUrl}">
-                        posted by ${post.name} at ${new Date(post.timestamp).toLocaleString()}
-                    </div>
-                `;
-                if (post.comment) {
-                    html += `<div class="post-comment">${post.comment}</div>`;
-                }
-                postElement.innerHTML = html;
-                postsContainer.appendChild(postElement);
-            });
-        })
-        .catch(err => console.error('Error fetching posts:', err));
-}
-
-    // Call this when page loads
     window.onload = function () {
-            fetchUserInfo();
             fetchPosts();
         };
 </script>
@@ -77,7 +65,6 @@
                 <label for="comment">Comment:</label>
                 <input type="text" name="comment" id="comment">
             </div>
-            <input type="hidden" name="name" id="name">
             <button type="submit">Post to Community</button>
         </form>
     </div>
