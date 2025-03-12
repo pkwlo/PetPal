@@ -5,7 +5,6 @@
     <title>Reminders</title>
     <link rel="stylesheet" href="/css/style.css">
     <script>
-        // Fetch user info and populate the page
         function fetchUserInfo() {
             fetch('/profile/user-info')
                 .then(response => response.json())
@@ -14,60 +13,53 @@
                         alert(data.error);
                         window.location.href = '/login';
                     } else {
-                        // Populate user info
                         document.getElementById('name').innerText = data.name;
-                        document.getElementById('userId').value = data.userId;
                     }
                 });
-        }
+            }
         
-        // Fetch upcoming events and populate the page
         function fetchUpcomingEvents() {
-    fetch('/reminders/upcoming')
-        .then(response => response.json())
-        .then(data => {
-            data.sort((a, b) => new Date(a.reminderDate) - new Date(b.reminderDate));
+            fetch('/reminders/upcoming')
+                .then(response => response.json())
+                .then(data => {
+                    const upcomingEvents = data
+                        .filter(event => new Date(event.reminderDate) >= new Date())
+                        .sort((a, b) => new Date(a.reminderDate) - new Date(b.reminderDate));
+                    const eventsContainer = document.querySelector('.events');
+                    eventsContainer.innerHTML = '';
+                    if (upcomingEvents.length === 0) {
+                        eventsContainer.innerHTML = `<p class="no-events">No upcoming events.</p>`;
+                        return;
+                    }
+                    upcomingEvents.forEach(event => {
+                        const eventElement = document.createElement('div');
+                        eventElement.classList.add('event');
 
-            const eventsContainer = document.querySelector('.events');
-            eventsContainer.innerHTML = '';
+                        let html = `
+                            <div class="event-title">
+                                <h2>${event.reminderType?.toUpperCase() || ''}</h2>
+                            </div>
+                            <div class="event-info">
+                                <p><strong>Date:</strong> ${event.reminderDate || ''}</p>
+                        `;
+                        if (event.reminderTime) {
+                            html += `<p><strong>Time:</strong> ${event.reminderTime}</p>`;
+                        }
+                        html += `</div>`;
+                        if (event.reminderDescription) {
+                            html += `
+                                <div class="event-description">
+                                    <p><strong>Description:</strong> ${event.reminderDescription}</p>
+                                </div>
+                            `;
+                        }
+                        eventElement.innerHTML = html;
+                        eventsContainer.appendChild(eventElement);
+                    });
+                })
+                .catch(err => console.error('Error fetching events:', err));
+            }
 
-            data.forEach(event => {
-                const eventElement = document.createElement('div');
-                eventElement.classList.add('event');
-
-                // Build inner HTML dynamically
-                let html = `
-                    <div class="event-title">
-                        <h2>${event.reminderType?.toUpperCase() || ''}</h2>
-                    </div>
-                    <div class="event-info">
-                        <p><strong>Date:</strong> ${event.reminderDate || ''}</p>
-                `;
-
-                // Only show time if it exists
-                if (event.reminderTime) {
-                    html += `<p><strong>Time:</strong> ${event.reminderTime}</p>`;
-                }
-
-                html += `</div>`; // Close event-info div
-
-                // Only show description if it exists
-                if (event.reminderDescription) {
-                    html += `
-                        <div class="event-description">
-                            <p><strong>Description:</strong> ${event.reminderDescription}</p>
-                        </div>
-                    `;
-                }
-
-                eventElement.innerHTML = html;
-                eventsContainer.appendChild(eventElement);
-            });
-        });
-}
-
-
-        // Run the fetch when the page loads
         window.onload = function () {
             fetchUserInfo();
             fetchUpcomingEvents();
@@ -102,7 +94,6 @@
                 <label for="reminderDescription">Reminder Description:</label>
                 <input name="reminderDescription" id="reminderDescription">
             </div>
-            <input type="hidden" name="userId" id="userId">
             <button type="submit">Set Reminder</button>
         </form>
     </div>

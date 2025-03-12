@@ -207,6 +207,13 @@ button {
     margin-bottom: 4px;
 }
 
+.no-events, .no-posts {
+    font-style: italic;
+    text-align: center;
+    margin-top: 20px;
+    color: gray;
+}
+
 /* posts */
 .posts {
     display: flex;
