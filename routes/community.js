@@ -42,7 +42,6 @@ router.post('/submit', upload.single('photo'), async (req, res) => {
             Key: key,
             Body: file.buffer,
             ContentType: file.mimetype
-            // No ACL — Bucket Owner Enforced mode
         };
 
         console.log('Uploading to S3...');

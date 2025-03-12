@@ -18,33 +18,36 @@
                 });
         }
 
-    function fetchPosts() {
-        fetch('/community/posts')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Fetched posts:', data); // <--- add this line
-                const postsContainer = document.querySelector('.posts');
-                postsContainer.innerHTML = '';
+        function fetchPosts() {
+    fetch('/community/posts')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched posts:', data);
+            const postsContainer = document.querySelector('.posts');
+            postsContainer.innerHTML = '';
 
-                data.forEach(post => {
-                    const postElement = document.createElement('div');
-                    postElement.classList.add('post');
+            // 🔥 Sort by timestamp (descending: most recent first)
+            data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-                    let html = `
-                        <div class="post-image">
-                            <img src="${post.imageUrl}">
-                            posted by ${post.name}
-                        </div>
-                    `;
-                    if (post.comment) {
-                        html += `<div class="post-comment">${post.comment}</div>`;
-                    }
-                    postElement.innerHTML = html;
-                    postsContainer.appendChild(postElement);
-                });
-            })
-            .catch(err => console.error('Error fetching posts:', err)); // <-- also important
-    }
+            data.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.classList.add('post');
+
+                let html = `
+                    <div class="post-image">
+                        <img src="${post.imageUrl}">
+                        posted by ${post.name} at ${new Date(post.timestamp).toLocaleString()}
+                    </div>
+                `;
+                if (post.comment) {
+                    html += `<div class="post-comment">${post.comment}</div>`;
+                }
+                postElement.innerHTML = html;
+                postsContainer.appendChild(postElement);
+            });
+        })
+        .catch(err => console.error('Error fetching posts:', err));
+}
 
     // Call this when page loads
     window.onload = function () {
