@@ -14,9 +14,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(session({
-    secret: 'your-secret-key', // Change this to a secure random string
+    secret: 'your-secret-key',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false, // keep false on localhost, true if deployed with HTTPS
+        sameSite: 'lax' // works for same-origin, safe
+    }
 }));
 
 // Initialize OpenID Client
@@ -65,10 +70,16 @@ app.get('/authorize', async (req, res) => {
         const userInfo = await client.userinfo(tokenSet.access_token);
         req.session.userInfo = userInfo;
 
-        res.redirect('/profile'); // Redirect to profile page after login
+        req.session.save(err => {
+            if (err) {
+                console.error('Error saving session:', err);
+            }
+            res.redirect('/profile');
+        });
+        
     } catch (err) {
         console.error('Callback error:', err);
-        res.redirect('/'); // Redirect to home if there's an error
+        res.redirect('/');
     }
 });
 

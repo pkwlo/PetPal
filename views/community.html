@@ -4,6 +4,8 @@
 <head>
     <title>Community</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <script>
     function fetchPosts() {
         fetch('/community/posts')
@@ -35,11 +37,57 @@
                     if (post.comment) {
                         html += `<div class="post-comment">${post.comment}</div>`;
                     }
+                    html += `
+                        <div class="like-bar">
+                            <div class="post-actions">
+                                <button onclick="likePost('${post.imageId}')"><i class="fa-solid fa-heart"></i> (${post.likes ? post.likes.length : 0})</button>
+                            </div>
+                            <div class="comment-form">
+                                <input type="text" placeholder="Add a comment..." id="comment-${post.imageId}">
+                                <button onclick="submitComment('${post.imageId}')">Post</button>
+                            </div>
+                        </div>
+                        <div class="post-comments">
+                            ${(post.comments || []).map(c => `
+                                <div class="comment"><strong>${c.userName}:</strong> ${c.text}</div>
+                            `).join('')}
+                        </div>
+                    `;
+
                     postElement.innerHTML = html;
                     postsContainer.appendChild(postElement);
                 });
             })
             .catch(err => console.error('Error fetching posts:', err));
+    }
+    function likePost(imageId) {
+        fetch(`/community/like/${imageId}`, {
+            method: 'POST',
+            credentials: 'include' 
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) fetchPosts();
+        });
+    }
+
+
+    function submitComment(imageId) {
+        const input = document.querySelector(`#comment-${imageId}`);
+        const text = input.value;
+        if (!text) return;
+
+        fetch(`/community/comment/${imageId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ text })
+        })
+        .then(res => res.json())
+        .then(data => {
+            input.value = '';
+            fetchPosts(); // reload to see new comment
+        });
     }
 
     window.onload = function () {

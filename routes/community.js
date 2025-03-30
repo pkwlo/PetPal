@@ -3,8 +3,8 @@ const multer = require('multer');
 const dotenv = require('dotenv');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { v4: uuidv4 } = require('uuid');
-const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
-const { ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, PutCommand, ScanCommand, GetCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+// const { ScanCommand } = require('@aws-sdk/lib-dynamodb');
 const path = require('path');
 
 dotenv.config();
@@ -23,6 +23,7 @@ router.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../views/community.html'));
 });
 
+// SUBMIT POST
 router.post('/submit', upload.single('photo'), async (req, res) => {
     const { comment } = req.body;
     const file = req.file;
@@ -75,6 +76,7 @@ router.post('/submit', upload.single('photo'), async (req, res) => {
     }
 });
 
+// GET ALL POSTS (UP TO 10)
 router.get('/posts', async (req, res) => {
     try {
         const dbParams = {
@@ -89,5 +91,89 @@ router.get('/posts', async (req, res) => {
         res.status(500).send('Error getting posts');
     }
 });
+
+// LIKE POST
+router.post('/like/:imageId', async (req, res) => {
+    const { imageId } = req.params;
+    const user = req.session.userInfo;
+
+    if (!user) {
+        return res.status(401).json({ error: 'User not logged in' });
+    }
+
+    const userId = user.email || user.name; // Use your preferred unique field
+
+    try {
+        const { Item } = await ddb.send(new GetCommand({
+            TableName: 'CommunityPosts',
+            Key: { imageId }
+        }));
+
+        if (!Item) return res.status(404).send('Post not found');
+
+        // Initialize or update likes array
+        let likes = Item.likes || [];
+
+        if (!likes.includes(userId)) {
+            likes.push(userId);
+
+            await ddb.send(new UpdateCommand({
+                TableName: 'CommunityPosts',
+                Key: { imageId },
+                UpdateExpression: 'SET likes = :likes',
+                ExpressionAttributeValues: { ':likes': likes }
+            }));
+        }
+
+        res.status(200).json({ success: true, likesCount: likes.length });
+    } catch (err) {
+        console.error('Error liking post:', err);
+        res.status(500).send('Error liking post');
+    }
+});
+
+
+// ADD COMMENT TO POST
+router.post('/comment/:imageId', express.json(), async (req, res) => {
+    const { imageId } = req.params;
+    const { text } = req.body;
+    const user = req.session.userInfo;
+
+    if (!user) {
+        return res.status(401).json({ error: 'User not logged in' });
+    }
+
+    const newComment = {
+        userId: user.email || user.name, // replace this with your unique identifier
+        userName: user.name,
+        text,
+        timestamp: new Date().toISOString()
+    };
+
+    try {
+        const { Item } = await ddb.send(new GetCommand({
+            TableName: 'CommunityPosts',
+            Key: { imageId }
+        }));
+
+        if (!Item) return res.status(404).send('Post not found');
+
+        const comments = Item.comments || [];
+        comments.push(newComment);
+
+        await ddb.send(new UpdateCommand({
+            TableName: 'CommunityPosts',
+            Key: { imageId },
+            UpdateExpression: 'SET comments = :comments',
+            ExpressionAttributeValues: { ':comments': comments }
+        }));
+
+        res.status(200).json({ success: true, comment: newComment });
+    } catch (err) {
+        console.error('Error adding comment:', err);
+        res.status(500).send('Error adding comment');
+    }
+});
+
 
 module.exports = router;
