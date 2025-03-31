@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { dynamoClient } = require('../db');
 const path = require('path');
+const sendEmail = require('../email_sender');
 
 router.get('/', (req, res) => {
     if (!req.session.userInfo) {
@@ -65,6 +66,16 @@ router.post('/submit', async (req, res) => {
     } catch (err) {
         console.error('Error adding reminder:', err);
         res.status(500).send('Error adding reminder');
+    }
+});
+
+router.post('/sendemail', async (req, res) => {
+    try {
+        await sendEmail.sendReminderEmails();
+        res.send('Emails sent successfully');
+    } catch (err) {
+        console.error('Error sending emails:', err);
+        res.status(500).send('Error sending emails');
     }
 });
 
