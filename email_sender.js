@@ -157,7 +157,7 @@ async function sendReminderEmails() {
                                 },
                                 Subject: {
                                     Charset: "UTF-8",
-                                    Data: "Test email",
+                                    Data: `Reminder: ${reminder.reminderType}`,
                                 },
                             },
                             Source: "donotreply.petpal@gmail.com",
