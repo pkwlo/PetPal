@@ -31,7 +31,7 @@ async function initializeClient() {
     client = new issuer.Client({
         client_id: process.env.COGNITO_APP_CLIENT_ID,
         client_secret: process.env.COGNITO_APP_CLIENT_SECRET,
-        redirect_uris: ['http://localhost:8080/authorize'], // Callback URL
+        redirect_uris: ['https://awsproject.jordannoailletas.com/authorize'], // Callback URL
         response_types: ['code']
     });
 }
@@ -59,7 +59,7 @@ app.get('/authorize', async (req, res) => {
     try {
         const params = client.callbackParams(req);
         const tokenSet = await client.callback(
-            'http://localhost:8080/authorize',
+            'https://awsproject.jordannoailletas.com/authorize',
             params,
             {
                 nonce: req.session.nonce,
@@ -104,7 +104,7 @@ app.get('/logout', (req, res) => {
         res.clearCookie('connect.sid');
 
         // Correct logout URL for Cognito
-        const logoutUrl = `https://us-west-2elnbcbqn3.auth.us-west-2.amazoncognito.com/logout?client_id=${process.env.COGNITO_APP_CLIENT_ID}&logout_uri=${encodeURIComponent('http://localhost:8080')}`;
+        const logoutUrl = `https://us-west-2elnbcbqn3.auth.us-west-2.amazoncognito.com/logout?client_id=${process.env.COGNITO_APP_CLIENT_ID}&logout_uri=${encodeURIComponent('https://awsproject.jordannoailletas.com/')}`;
 
         res.redirect(logoutUrl);
     });
@@ -122,5 +122,5 @@ app.use('/community', communityRoute);
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Server running at https://awsproject.jordannoailletas.com`);
 });
