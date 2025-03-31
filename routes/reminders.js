@@ -69,7 +69,7 @@ router.post('/submit', async (req, res) => {
     }
 });
 
-router.post('/sendemail', async (req, res) => {
+router.get('/sendemail', async (req, res) => {
     try {
         await sendEmail.sendReminderEmails();
         res.send('Emails sent successfully');
