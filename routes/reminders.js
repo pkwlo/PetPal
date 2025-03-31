@@ -72,7 +72,7 @@ router.post('/submit', async (req, res) => {
 router.get('/sendemail', async (req, res) => {
     try {
         await sendEmail.sendReminderEmails();
-        res.send('Emails sent successfully');
+        res.redirect('/reminders');
     } catch (err) {
         console.error('Error sending emails:', err);
         res.status(500).send('Error sending emails');
